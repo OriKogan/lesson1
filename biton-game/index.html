@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Biton: The Reckoning</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Patrick+Hand&display=swap" rel="stylesheet">
+<style>
+  :root { --bg: #0d0d12; --btn: rgba(0,0,0,0.38); --btn-on: rgba(255,225,77,0.7); --ink: #fff; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; height: 100%; background: var(--bg); overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none; }
+  body { display: flex; align-items: center; justify-content: center; font-family: 'Bangers', Impact, sans-serif; }
+  #wrap { position: relative; width: min(100vw, calc(100vh * 16 / 9)); aspect-ratio: 16 / 9; }
+  canvas { display: block; width: 100%; height: 100%; background: #000; image-rendering: auto; }
+  #touch { display: none; position: absolute; inset: 0; pointer-events: none; }
+  body.touch.in-fight #touch { display: block; }
+  .pad { position: absolute; bottom: 2%; display: grid; gap: 8px; pointer-events: auto; }
+  .pad.left { left: 1.5%; grid-template-columns: repeat(3, 1fr); grid-template-areas: ". up ." "left down right"; }
+  .pad.right { right: 1.5%; grid-template-columns: repeat(2, 1fr); }
+  .pad button { width: clamp(46px, 8.5vw, 84px); height: clamp(46px, 8.5vw, 84px); border-radius: 50%; border: 3px solid rgba(255,255,255,0.55);
+    background: var(--btn); color: var(--ink); font-family: inherit; font-size: clamp(11px, 1.7vw, 17px); letter-spacing: 0.5px; touch-action: none;
+    text-shadow: 0 1px 2px #000; }
+  .pad button.on { background: var(--btn-on); }
+  .pad.left [data-act="up"] { grid-area: up; } .pad.left [data-act="left"] { grid-area: left; }
+  .pad.left [data-act="down"] { grid-area: down; } .pad.left [data-act="right"] { grid-area: right; }
+  #menuBtn { display: none; position: absolute; top: 1.5%; left: 50%; transform: translateX(-50%) translateY(170%); width: 44px; height: 32px; border-radius: 8px;
+    border: 2px solid rgba(255,255,255,0.6); background: rgba(0,0,0,0.45); color: #fff; font-family: inherit; font-size: 16px; pointer-events: auto; }
+  body.touch #menuBtn { display: block; }
+  body.touch:not(.in-fight) #menuBtn { transform: translateX(-50%); }
+  @media (orientation: portrait) and (pointer: coarse) {
+    body::after { content: 'Turn your phone sideways'; position: fixed; top: 12px; left: 0; right: 0; text-align: center; color: #ffe14d; font-size: 22px; }
+  }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <canvas id="game" width="960" height="540" aria-label="Biton: The Reckoning, a fighting game"></canvas>
+  <div id="touch">
+    <div class="pad left">
+      <button data-act="up" aria-label="Jump">JUMP</button>
+      <button data-act="left" aria-label="Left">&#9664;</button>
+      <button data-act="down" aria-label="Block">BLOCK</button>
+      <button data-act="right" aria-label="Right">&#9654;</button>
+    </div>
+    <div class="pad right">
+      <button data-act="taunt">TAUNT</button>
+      <button data-act="special">SLIPPER</button>
+      <button data-act="punch">PUNCH</button>
+      <button data-act="kick">KICK</button>
+    </div>
+  </div>
+  <button id="menuBtn" data-act="pause" aria-label="Menu">II</button>
+</div>
+<script src="config.js"></script>
+<script src="audio.js"></script>
+<script src="game.js"></script>
+<script src="bosses.js"></script>
+</body>
+</html>
