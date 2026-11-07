@@ -5,8 +5,6 @@
    change them without touching the game engine.
 
    - Rename anyone: change `name` below.
-   - Add Biton's face: crop a photo of his face, save it as
-     assets/faces/biton.png and set  face: 'assets/faces/biton.png'
    - Level numbers: hp = boss health, aggression 0..1, block 0..1,
      dmg = how hard the boss hits (1 = normal).
    ===================================================================== */
@@ -30,7 +28,7 @@ const PLAYER = {
 const CHARACTERS = {
   biton: {
     name: 'BITON',
-    face: null, // put his photo at assets/faces/biton.png and write 'assets/faces/biton.png' here
+    face: null, // Biton stays a cartoon
     look: { skin: '#dba27c', hair: '#1d120c', hairStyle: 'messy', cap: '#d33', shirt: '#2f6fd6', shirtMark: 'B', pants: '#3a3a3a', shoes: '#ffffff' },
     taunts: ['Too easy!', 'I\'m not even using my good hand.', 'EZ.', 'You\'re done, achi!', 'Bro I\'m half asleep.'],
     hurtLines: ['That didn\'t count!', 'LAG!', 'Ow! Ow! Okay!', 'I WASN\'T READY!'],

@@ -38,11 +38,8 @@ a slow-mo K.O. where the loser's head pops off, rank grades and a sarcastic tip 
 ## Changing names, jokes and faces
 
 Everything you'd want to change lives in `config.js`: names, dialogue, taunts, roasts and level difficulty.
-Faces are cut-out photos in `assets/faces/`. Biton doesn't have a photo yet, so he's drawn as a cartoon.
-To use his real face:
-
-1. Crop a photo of his face (roughly square, face filling most of it) and save it as `assets/faces/biton.png`.
-2. In `config.js`, change Biton's `face: null` to `face: 'assets/faces/biton.png'`.
+The Selfie Squad, the Silan Sommelier and the Hydration Monk use cut-out photos from `assets/faces/`.
+Biton and the player are drawn as cartoons.
 
 ## Files
 
