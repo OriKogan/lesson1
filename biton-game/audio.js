@@ -114,7 +114,7 @@ const Sound = (() => {
       L: seq('E5 . G5 . E5 . C5 . D5 . . . . . . . E5 . G5 . A5 . G5 . E5 . D5 . C5 . . .'),
       B: seq('C3 . C3 C3 . . C3 . A2 . A2 A2 . . A2 . F2 . F2 F2 . . F2 . G2 . G2 G2 . . G2 .'),
       D: 'k.h.s.h.k.h.s.hhk.h.s.h.kkh.s.h.' },
-    silan: { bpm: 176, lead: { w: 'square', v: 0.08 }, bass: { w: 'triangle', v: 0.34 },
+    tom: { bpm: 176, lead: { w: 'square', v: 0.08 }, bass: { w: 'triangle', v: 0.34 },
       L: seq('E5 . E5 F5 G5 . E5 . C5 . C5 . D5 . . . F5 . F5 E5 D5 . B4 . C5 . E5 . C5 . . .'),
       B: seq('C3 . G2 . C3 . G2 . C3 . G2 . G2 . B2 . F2 . C3 . F2 . C3 . G2 . D3 . C3 . G2 .'),
       D: 'k.s.k.s.k.s.k.s.k.s.k.s.k.s.kss' },
@@ -178,7 +178,7 @@ const Sound = (() => {
   function stop() { if (timer) clearInterval(timer); timer = null; cur = null; pending = null; }
   function setTempo(x) { tempo = x; }
 
-  /* ---------------- text to speech (announcer + the Monk) ---------------- */
+  /* ---------------- text to speech (announcer + Ilay) ---------------- */
   function say(text, opt = {}) {
     if (muted || !window.speechSynthesis) return;
     try {

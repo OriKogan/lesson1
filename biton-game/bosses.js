@@ -12,30 +12,33 @@ const STAGES = {};
 const STAGE_OVERLAY = {};
 
 /* =====================================================================
-   CHAPTER 1: BITON
+   UNIVERSAL MODS: any boss can be `ultra`, check their `phone`, fake an
+   injury (`flop`), throw `excuses` or try to `rageQuit`. These wrap every
+   BOSSES entry at the bottom of this file.
    ===================================================================== */
-BOSSES.biton = {
-  setup(f, lv) {
-    f.ai.phoneT = 360; f.ai.excuseT = 160; f.flags.flops = 0; f.flags.quit = false;
-    if (lv.mods.ultra) { f.headScale = 1.25; f.aura = '#ffb020'; f.speedMul = 1.15; later(8, () => doAction(f, 'powerUp')); }
-  },
-  update(f) { f.ai.phoneT--; f.ai.excuseT--; },
-  think(f, dist) {
-    const m = G.level.mods;
-    if (m.rageQuit && !f.flags.quit && f.hp < f.maxHp * 0.3) { f.flags.quit = true; doAction(f, 'rageQuit'); return true; }
-    if (m.flop && f.flags.flops < 2 && f.hp < f.maxHp * (f.flags.flops ? 0.22 : 0.5)) { f.flags.flops++; doAction(f, 'flop'); return true; }
-    if (m.phone && f.ai.phoneT <= 0 && dist > 150) { f.ai.phoneT = 520 + rand(300); doAction(f, 'phone'); return true; }
-    if (m.excuses && f.ai.excuseT <= 0 && dist > 130) { f.ai.excuseT = (m.ultra ? 80 : 140) + rand(110); doAction(f, 'excuse'); return true; }
-    return false;
-  },
-};
+function commonSetup(f, lv) {
+  f.ai.phoneT = 360; f.ai.excuseT = 160; f.flags.flops = 0; f.flags.quit = false;
+  if (lv.mods.ultra && G.enemies[0] === f) {
+    f.name = 'ULTRA ' + f.name; f.headScale = 1.25; f.aura = f.aura || '#ffb020'; f.speedMul *= 1.15;
+    later(8, () => doAction(f, 'powerUp'));
+  }
+}
+function commonUpdate(f) { f.ai.phoneT--; f.ai.excuseT--; }
+function commonThink(f, dist) {
+  const m = G.level.mods;
+  if (m.rageQuit && !f.flags.quit && f.hp < f.maxHp * 0.3) { f.flags.quit = true; doAction(f, 'rageQuit'); return true; }
+  if (m.flop && f.flags.flops < 2 && f.hp < f.maxHp * (f.flags.flops ? 0.22 : 0.5)) { f.flags.flops++; doAction(f, 'flop'); return true; }
+  if (m.phone && f.ai.phoneT <= 0 && dist > 150) { f.ai.phoneT = 520 + rand(300); doAction(f, 'phone'); return true; }
+  if (m.excuses && f.ai.excuseT <= 0 && dist > 130) { f.ai.excuseT = (m.ultra ? 80 : 140) + rand(110); doAction(f, 'excuse'); return true; }
+  return false;
+}
 
 ACTIONS.powerUp = {
   dur: 100, pose: 'flex', armor: true,
   start(f) { say(f, 'AAAAAAAAAAAAAA!!!', 100); },
   update(f, a) {
     if (a.t % 8 === 0) { G.shake = Math.max(G.shake, 5); sparkFx(f.x + rand(-40, 40), f.y - rand(20, 200), '#ffb020', 3); }
-    if (a.t === 60) { popText(f.x, f.y - 280, 'ULTRA!', '#ffb020', 56); Sound.fx.boing(); }
+    if (a.t === 60) { popText(f.x, f.y - 280, 'ULTRA!', '#ffb020', 56); Sound.fx.boing(); G.flash = 0.6; }
   },
 };
 ACTIONS.phone = {
@@ -82,7 +85,7 @@ ACTIONS.rageQuit = {
     if (a.t % 12 === 0) G.particles.push({ type: 'sweat', x: f.x + rand(-20, 20), y: f.y - 220, vx: rand(-1.5, 1.5), vy: -2, t: 0, life: 30 });
     if ((a.dir > 0 && f.x >= W - 40) || (a.dir < 0 && f.x <= 40)) {
       f.hp = Math.min(f.maxHp, f.hp + f.maxHp * 0.25);
-      say(f, '...my mom says I have to finish.', 140);
+      say(f, pick(['...my mom says I have to finish.', '...the door was locked.', '...I forgot my keys here.']), 140);
       popText(f.x, f.y - 270, '+25% HP', '#7dff6b', 32);
       endAction(f);
     }
@@ -92,9 +95,9 @@ ACTIONS.rageQuit = {
 };
 
 /* =====================================================================
-   CHAPTER 2: THE SELFIE SQUAD (Sir Hat-a-Lot + Mr. Shook)
+   FIGHTS 1 AND 2: NITZAN AND ORI
    ===================================================================== */
-BOSSES.hat = {
+BOSSES.nitzan = {
   setup(f) { f.ai.hatT = 160; f.ai.pointT = 260; f.flags.hats = 0; },
   update(f) { f.ai.hatT--; f.ai.pointT--; },
   think(f, dist) {
@@ -104,7 +107,7 @@ BOSSES.hat = {
     return false;
   },
 };
-BOSSES.shook = {
+BOSSES.ori = {
   setup(f) { f.ai.screamT = 220; f.ai.pointT = 330; },
   update(f) { f.ai.screamT--; f.ai.pointT--; },
   think(f, dist) {
@@ -152,11 +155,11 @@ ACTIONS.scream = {
   update(f, a) {
     f.headScale = 1 + 0.65 * Math.sin(PI * Math.min(1, a.t / 62));
     if (a.t !== 26) return;
-    G.particles.push({ type: 'ring', x: f.x, y: f.y - 120, t: 0, life: 30, speed: 8, color: '#fff' });
+    G.particles.push({ type: 'ring', x: f.x, y: f.y - 120, vx: 0, vy: 0, t: 0, life: 30, speed: 8, color: '#fff' });
     G.shake = 8;
     const p = G.player;
     if (p.hp > 0 && Math.abs(p.x - f.x) < 200 && p.invuln <= 0) {
-      const landed = hitFighter(f, p, { dmg: 6, kb: 11, stun: 12, dir: p.x >= f.x ? 1 : -1, words: ['SHOOK!', 'WHAAAT!'] });
+      const landed = hitFighter(f, p, { dmg: 6, kb: 11, stun: 12, dir: p.x >= f.x ? 1 : -1, words: ['WHOA!', 'WHAAAT!'] });
       if (landed && p.hp > 0) doAction(p, 'dizzy');
     }
   },
@@ -267,7 +270,7 @@ GIMMICKS.groupSelfie = {
 ACTIONS.groupPose = {
   dur: 180, armor: true,
   start(f, a) {
-    a.pose = a.solo ? 'selfie' : f.key === 'hat' ? 'groupPoint' : 'selfie';
+    a.pose = a.solo ? 'selfie' : f.key === 'nitzan' ? 'groupPoint' : 'selfie';
     f.vx = 0;
     if (a.lead) say(f, a.solo ? 'Sad solo selfie... for my bro.' : 'GROUP SELFIEEEE!', 60);
     if (a.lead && !G.gim.gsHint) { G.gim.gsHint = true; hint('THEY\'RE POSING: FREE HITS! BUT BLOCK (OR TAUNT) ON 1!'); }
@@ -287,9 +290,9 @@ ACTIONS.groupPose = {
 };
 
 /* =====================================================================
-   CHAPTER 3: THE SILAN SOMMELIER
+   FIGHT 3: TOM
    ===================================================================== */
-BOSSES.silan = {
+BOSSES.tom = {
   setup(f) { f.ai.jarT = 120; f.ai.offerT = 380; f.ai.eatT = 260; f.ai.lineT = 300; f.flags.sugar = 0; f.flags.sugarT = 0; },
   update(f) {
     f.ai.jarT--; f.ai.offerT--; f.ai.eatT--; f.ai.lineT--;
@@ -369,7 +372,7 @@ ACTIONS.sugarCrash = {
   start(f) { f.lying = true; say(f, '...sugar... crash...', 100); popText(f.x + f.facing * 100, f.y - 150, 'SUGAR CRASH!', '#9cf', 36); hint('HE\'S ASLEEP. GO WILD.'); },
   update(f, a) { f.lying = true; if (a.t % 30 === 0) zzzFx(f.x + f.facing * 175, f.y - 80); if (a.t % 60 === 0) Sound.fx.snore(); },
   onHit() { return { mult: 1.3, keep: true }; },
-  end(f) { f.flags.sugar = 0; f.flags.sugarT = 0; say(f, 'Wha-? Who? Silan?', 80); },
+  end(f) { f.flags.sugar = 0; f.flags.sugarT = 0; say(f, 'Wha-? Where\'s my syrup?', 80); },
 };
 
 GIMMICKS.jarRain = {
@@ -404,9 +407,9 @@ GIMMICKS.wave = {
 };
 
 /* =====================================================================
-   CHAPTER 4: THE HYDRATION MONK
+   FIGHT 4: ILAY
    ===================================================================== */
-BOSSES.monk = {
+BOSSES.ilay = {
   setup(f, lv) {
     f.flags.hasBottle = true;
     Object.assign(f.ai, { drinkT: 320, splashT: 220, lectureT: 380, laserT: 220, lineT: 420 });
@@ -566,6 +569,32 @@ function drawStage(lv) {
   const s = STAGES[lv.stage];
   if (s) s(lv.variant, G.sceneT);
   else { ctx.fillStyle = '#333'; ctx.fillRect(0, 0, W, H); }
+  if (lv.mods && lv.mods.ultra) drawUltraFx(G.sceneT);
+}
+/* Red sky, rising embers and the odd lightning bolt: an ULTRA round, on any stage. */
+function drawUltraFx(t) {
+  const g = ctx.createLinearGradient(0, 0, 0, GROUND);
+  g.addColorStop(0, 'rgba(120,0,0,0.42)'); g.addColorStop(1, 'rgba(60,0,0,0.12)');
+  ctx.fillStyle = g; ctx.fillRect(0, 0, W, GROUND);
+  for (let i = 0; i < 30; i++) {
+    const x = (i * 97 + t * (0.4 + (i % 3) * 0.3)) % W, y = H - ((t * 1.3 + i * 53) % H);
+    ellipse(x, y, 2.5, 2.5, i % 2 ? '#ffb020' : '#ff5a1a');
+  }
+  if (t % 240 < 8) {
+    ctx.fillStyle = 'rgba(255,255,255,0.22)'; ctx.fillRect(0, 0, W, H);
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 4; ctx.beginPath();
+    let x = 300 + (Math.floor(t / 240) * 211) % 400, y = 0; ctx.moveTo(x, y);
+    while (y < 330) { x += rand(-30, 30); y += 40; ctx.lineTo(x, y); }
+    ctx.stroke();
+  }
+}
+
+/* Give every boss the universal mods (ultra, phone, flop, excuses, rageQuit). */
+for (const B of Object.values(BOSSES)) {
+  const setup = B.setup, update = B.update, think = B.think;
+  B.setup = (f, lv) => { commonSetup(f, lv); if (setup) setup(f, lv); };
+  B.update = f => { commonUpdate(f); if (update) update(f); };
+  B.think = (f, dist, dx) => commonThink(f, dist) || (think ? think(f, dist, dx) : false);
 }
 function cloud(x, y, col) {
   ctx.fillStyle = col;
@@ -716,7 +745,7 @@ STAGES.kitchen = () => {
   for (let x = 0; x < W; x += 64) { ctx.beginPath(); ctx.moveTo(x, GROUND); ctx.lineTo(x, H); ctx.stroke(); }
   ctx.beginPath(); ctx.moveTo(0, GROUND + 36); ctx.lineTo(W, GROUND + 36); ctx.stroke();
 };
-function silanPrice() {
+function syrupPrice() {
   const e = G.sceneName === 'fight' && G.enemies[0];
   return (29.9 * (e ? Math.max(0, e.hp) / e.maxHp : 1)).toFixed(2);
 }
@@ -737,7 +766,7 @@ STAGES.infomercial = (v, t) => {
   ctx.beginPath();
   for (let i = 0; i < 24; i++) { const r = i % 2 ? 58 : 80, an = i * TAU / 24; ctx.lineTo(Math.cos(an) * r, Math.sin(an) * r); }
   ctx.closePath(); ctx.fillStyle = '#ffe14d'; ctx.fill(); ctx.lineWidth = 3; ctx.strokeStyle = OUTLINE; ctx.stroke();
-  txt('NOW ONLY', 0, -18, 18, '#d6201f', 'center', null); txt(`₪${silanPrice()}`, 0, 12, 30, '#d6201f', 'center', null);
+  txt('NOW ONLY', 0, -18, 18, '#d6201f', 'center', null); txt(`₪${syrupPrice()}`, 0, 12, 30, '#d6201f', 'center', null);
   ctx.restore();
   kitchenBack(true);
   for (let r = 0; r < 3; r++) for (let c = 0; c <= 2 - r; c++) { ctx.save(); ctx.translate(380 + c * 34 + r * 17, 360 - r * 38); jarShape(1.1); ctx.restore(); }
@@ -748,7 +777,7 @@ STAGES.infomercial = (v, t) => {
 };
 STAGE_OVERLAY.infomercial = () => {
   ctx.fillStyle = '#d6201f'; ctx.fillRect(0, H - 22, W, 22);
-  const s = '  CALL NOW: 1-800-SILAN  *  100% DATES  *  OPERATORS ARE STANDING BY  *  SIDE EFFECTS MAY INCLUDE SPEED  *  ';
+  const s = '  CALL NOW: 1-800-SYRUP  *  100% DATES  *  OPERATORS ARE STANDING BY  *  SIDE EFFECTS MAY INCLUDE SPEED  *  ';
   ctx.font = `18px ${FONT_HEAD}`;
   const w = ctx.measureText(s).width, off = (G.sceneT * 2) % w;
   for (let x = -off; x < W; x += w) txt(s, x, H - 10, 18, '#fff', 'left', null);
