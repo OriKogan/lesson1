@@ -1,0 +1,174 @@
+/* Illustrated clubhouse: artwork is raster; changing labels and controls are HTML. */
+body.in-lobby #wrap,body.in-lobby .controls-bar,body.in-lobby #touch,body.in-lobby #touchUtility,body.in-lobby #mobileGuide { display:none !important; }
+#lobby { --lb-ink:#27212a; --lb-paper:#fff4dc; --lb-yellow:#ffda38; position:fixed; inset:0; z-index:30; overflow:auto; overflow-x:hidden; background:#f5e8ce; color:var(--lb-ink); font:16px/1.45 system-ui,sans-serif; touch-action:pan-y; user-select:text; overscroll-behavior:contain; scrollbar-color:#c96a37 #f4e7ce; }
+#lobby[hidden] { display:none !important; }
+#lobby *,#lobby *::before,#lobby *::after { box-sizing:border-box; }
+#lobby h1,#lobby h2,#lobby h3,#lobby p,#lobby figure { margin:0; }
+#lobby button { cursor:pointer; color:var(--lb-ink); font:inherit; touch-action:manipulation; min-height:44px; }
+#lobby button:disabled { cursor:default; }
+#lobby button:focus-visible { outline:4px solid #1248c1; outline-offset:5px; }
+#lobby img { display:block; user-select:none; pointer-events:none; }
+.lb-shell { max-width:1800px; margin:auto; }
+.lb-header { min-height:112px; padding:16px 3.2%; display:flex; align-items:center; gap:3.5%; border-bottom:3px solid var(--lb-ink); background:#fff3d9; position:relative; z-index:3; }
+.lb-brand { display:flex; align-items:center; gap:25px; }
+.lb-brand-title { display:block; font:clamp(40px,4.3vw,68px)/.85 Bangers,Impact,sans-serif; letter-spacing:1px; text-shadow:3px 3px #ffcb38; transform:rotate(-3deg); }
+.lb-brand-title span { display:block; margin-top:10px; font:700 12px/1 system-ui,sans-serif; letter-spacing:1.5px; text-shadow:none; white-space:nowrap; }
+.lb-edition { border-left:2px solid var(--lb-ink); padding-left:24px; font:clamp(22px,2.2vw,34px)/1 Bangers,Impact,sans-serif; transform:rotate(-3deg); }
+.lb-nav { display:flex; gap:14px; align-items:center; }
+.lb-nav button { padding:9px 24px; border:3px solid var(--lb-ink); border-radius:4px; background:#fff8e9; box-shadow:3px 4px var(--lb-ink); font-size:clamp(18px,2vw,28px) !important; font-weight:750 !important; }
+.lb-nav button[aria-current=page] { background:var(--lb-yellow); }
+.lb-nav button span { font-size:12px; vertical-align:middle; padding:2px 5px; margin-left:4px; border:1px solid; }
+.lb-wallet { margin-left:auto; display:flex; align-items:baseline; gap:10px; background:var(--lb-yellow); border:3px solid var(--lb-ink); padding:10px 24px; box-shadow:5px 5px var(--lb-ink); transform:rotate(3deg); white-space:nowrap; }
+.lb-wallet strong { font:clamp(28px,3vw,48px)/1 Bangers,Impact,sans-serif; }
+.lb-wallet span { font-size:16px; font-weight:800; }
+.lb-feedback:not(.has-message) { height:0; overflow:hidden; }
+.lb-feedback.has-message { padding:12px 24px; background:#fff0b8; border-bottom:2px solid var(--lb-ink); font-weight:650; }
+.lb-stage { position:relative; isolation:isolate; display:grid; grid-template-columns:1.03fr 1fr; padding:28px 3% 26px 1%; gap:0; min-height:690px; height:calc(100dvh - 112px); max-height:1060px; }
+.lb-room { position:absolute; inset:0; z-index:-2; width:100%; height:100%; object-fit:cover; object-position:center; }
+.lb-poster { grid-column:2; grid-row:1; position:relative; align-self:center; aspect-ratio:3 / 4; min-width:0; margin:0 0 0 2%; }
+.lb-poster-media { position:absolute; inset:0; }
+.lb-poster-paper { width:100%; height:100%; object-fit:contain; }
+.lb-poster-copy { position:relative; height:100%; padding:13% 10% 10%; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; }
+.lb-next-label { font:clamp(28px,3.4vw,53px)/1.1 Bangers,Impact,sans-serif; transform:rotate(-3deg); }
+.lb-poster h1 { margin:17px 0 18px !important; font:clamp(62px,8.9vw,150px)/.98 Bangers,Impact,sans-serif; letter-spacing:2px; color:#fff8df; -webkit-text-stroke:1.5px var(--lb-ink); paint-order:stroke fill; text-shadow:4px 5px var(--lb-ink); transform:rotate(-3deg); }
+.lb-progress { font-size:clamp(20px,2.4vw,38px); font-weight:800; font-style:italic; }
+.lb-round { display:block; font-size:.62em; font-weight:700; letter-spacing:.3px; }
+.lb-poster.is-complete h1 { font-size:clamp(55px,6.5vw,105px); }
+.lb-poster.is-complete .lb-next-label { font-size:clamp(20px,2vw,30px); }
+.lb-button { border:3px solid var(--lb-ink); border-radius:4px; padding:10px 18px; background:#fff8e6; box-shadow:3px 4px var(--lb-ink); font-weight:800 !important; text-align:center; transition:transform .15s,box-shadow .15s,background-color .15s; }
+.lb-button:hover:not(:disabled) { background:#fff1aa; transform:translateY(-2px); box-shadow:4px 6px var(--lb-ink); }
+.lb-button:active:not(:disabled) { transform:translate(2px,3px); box-shadow:1px 1px var(--lb-ink); }
+.lb-button:disabled { color:#665c4c !important; background:#ddd4bd; border-color:#827765; box-shadow:2px 3px #827765; }
+.lb-play { margin-top:33px; width:100%; padding:14px 12px; min-height:100px !important; background:var(--lb-yellow); font:clamp(33px,4.6vw,77px)/1.1 Bangers,Impact,sans-serif !important; transform:rotate(-2deg); box-shadow:5px 7px var(--lb-ink); white-space:nowrap; }
+.lb-fight-reward { margin-top:23px !important; font-size:clamp(14px,1.5vw,22px); font-weight:800; font-style:italic; line-height:1.35; }
+.lb-text-button { border:0; background:transparent; font-weight:750 !important; text-decoration:underline; text-underline-offset:4px; padding:9px 10px; }
+.lb-opponent-link { margin-top:10px; font-size:15px !important; }
+.lb-showcase { grid-column:1; grid-row:1; position:relative; min-width:0; }
+.lb-character { position:absolute; right:-13%; bottom:-1%; height:100%; aspect-ratio:2 / 3; animation:lb-breathe 5s ease-in-out infinite; transform-origin:50% 98%; }
+.lb-costume { position:absolute; width:100%; height:100%; object-fit:contain; }
+.lb-face { position:absolute; z-index:2; width:26%; height:auto; left:37.97%; top:0; }
+.lb-held { position:absolute; z-index:3; object-fit:contain; transform-origin:50% 85%; }
+.lb-held-pan { width:21%; height:30%; left:62%; top:26.5%; transform:rotate(-154deg); }
+.lb-held-bat { width:20%; height:36%; left:62%; top:20%; transform:rotate(-157deg); }
+.lb-held-gloves { width:17.5%; height:11.5%; left:63.75%; top:38.7%; transform:rotate(170deg); }
+.lb-held-second { left:24%; top:38.7%; transform:rotate(188deg) scaleX(-1); }
+.lb-loadout { position:absolute; z-index:4; top:14%; left:29%; max-width:37%; }
+.lb-kicker { display:block; font:28px/1.1 Bangers,Impact,sans-serif; letter-spacing:.6px; color:#32252b; }
+.lb-loadout h2 { font-size:clamp(19px,1.7vw,27px); margin-top:13px !important; font-weight:850; }
+.lb-loadout p { margin-top:4px !important; color:#654830; font-size:18px; }
+.lb-change { margin-top:16px; font-size:16px !important; white-space:nowrap; }
+.lb-chest { position:absolute; z-index:4; left:2%; bottom:8%; width:44%; }
+.lb-chest-art { width:100%; height:auto; max-height:270px; object-fit:contain; animation:lb-chest-glint 7s ease-in-out infinite; }
+.lb-chest-label { margin-top:-10px; position:relative; text-align:center; padding:12px 10px 15px; background:#fff5dedf; border:2px solid #46322c; box-shadow:3px 4px #46322c; transform:rotate(-2deg); }
+.lb-chest h2 { font:clamp(20px,2vw,30px)/1.2 Bangers,Impact,sans-serif; }
+.lb-chest h2 span { display:block; font:700 14px/1.3 system-ui,sans-serif; margin-top:4px; }
+.lb-chest-open { margin-top:10px; font:clamp(17px,1.6vw,25px)/1.2 Bangers,Impact,sans-serif !important; width:100%; }
+.lb-chest p { margin-top:10px !important; font-size:14px; font-weight:750; }
+.lb-chest small { display:block; margin-top:5px; font-size:11px; color:#66523d; }
+.lb-footer { display:flex; align-items:center; flex-wrap:wrap; justify-content:space-between; gap:10px 20px; padding:17px 3%; background:#f9edcf; border-top:2px solid #6d5440; font-size:12px; color:#70573e; }
+.lb-footer>span { font:19px/1 Bangers,Impact,sans-serif; color:#36292b; letter-spacing:.6px; }
+.lb-footer small { font-size:12px; }
+.lb-locker { padding:36px 3.5% 45px; }
+.lb-locker-heading { display:flex; justify-content:space-between; align-items:center; gap:20px; padding-bottom:25px; }
+.lb-locker h1 { font:64px/1.1 Bangers,Impact,sans-serif; margin:8px 0 !important; }
+.lb-locker-heading p { color:#725438; }
+.lb-owned { font:27px/1 Bangers,Impact,sans-serif; white-space:nowrap; }
+.lb-locker-layout { display:grid; grid-template-columns:minmax(220px,27%) 1fr; gap:32px; }
+.lb-fitting-room { position:sticky; top:20px; align-self:start; padding:0 12px 24px; text-align:center; border-right:2px solid #bda883; }
+.lb-fitting-art { position:relative; height:440px; }
+.lb-character-mini { right:50%; margin-right:-146.67px; height:440px; bottom:0; }
+.lb-fitting-room h2 { font:32px/1.1 Bangers,Impact,sans-serif; }
+.lb-fitting-room p { margin:5px 0 15px !important; }
+.lb-collection>section+section { margin-top:32px; }
+.lb-collection>section>h2 { font:32px/1 Bangers,Impact,sans-serif; padding-bottom:14px; border-bottom:2px solid #8a6f52; margin-bottom:18px !important; }
+.lb-collection h2 small { font:14px/1.3 system-ui,sans-serif; margin-left:14px; color:#76583e; }
+.lb-items { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:13px; }
+.lb-item { display:flex; flex-direction:column; padding:14px; background:#fff7e5; border:2px solid #433129; box-shadow:3px 4px #433129; }
+.lb-item.is-equipped { background:#ffe28a; }
+.lb-item-top { display:flex; align-items:center; justify-content:space-between; gap:4px; font-size:9px; font-weight:800; letter-spacing:.4px; }
+.lb-item-top>span:last-child { font-size:8px; }
+.lb-item h3 { font:25px/1.05 Bangers,Impact,sans-serif; margin-top:8px !important; }
+.lb-item p { font-size:13px; color:#6b5139; margin:8px 0 16px !important; }
+.lb-item-art { position:relative; height:150px; display:flex; align-items:center; justify-content:center; margin:8px 0; gap:5px; }
+.lb-item-art>img { max-width:100%; height:100%; object-fit:contain; }
+.lb-outfit-art>img { width:100%; object-position:center 44%; }
+.lb-bare-art { flex-direction:column; }
+.lb-bare-art>img { height:105px; }
+.lb-bare-art>span { font:17px/1 Bangers,Impact,sans-serif; text-align:center; }
+.lb-bare-art small { display:block; font:11px/1.3 system-ui,sans-serif; margin-top:5px; }
+.lb-damage { position:absolute; right:-3px; bottom:0; font:28px/1 Bangers,Impact,sans-serif; background:#fff2cd; padding:5px; border:1px solid #7c6348; }
+.lb-damage small { display:block; font:8px/1 system-ui,sans-serif; margin-top:2px; }
+.lb-equip { margin-top:auto; width:100%; min-height:44px; border:2px solid #493b2b; border-radius:2px; background:#fffaf0; font-size:14px !important; font-weight:750 !important; }
+.lb-equip:hover:not(:disabled) { background:#ffdc52; }
+.lb-equip:disabled { color:#786a53 !important; background:#e9dfc7; border-color:#b5a78c; }
+.is-equipped .lb-equip:disabled { color:#fff9e4 !important; background:#315c43; border-color:#254b35; }
+#lobby .lb-reveal { padding:30px; width:min(450px,calc(100vw - 32px)); max-height:calc(100dvh - 36px); border:3px solid var(--lb-ink); border-radius:5px; background:#fff1c5; color:var(--lb-ink); box-shadow:8px 10px var(--lb-ink); text-align:center; animation:lb-reward-pop .3s ease-out; overflow-y:auto; }
+#lobby .lb-reveal::backdrop { background:#201d27bb; }
+.lb-reveal h2 { font:50px/1.1 Bangers,Impact,sans-serif; margin-top:10px !important; }
+#lobby .lb-reveal p { color:#604a31; margin:8px 0 !important; }
+.lb-reveal .lb-kicker { font-size:22px; }
+.lb-reveal .lb-art-large { height:225px; }
+.lb-reward-note { font-size:14px; }
+.lb-reveal .lb-button { width:100%; margin-top:15px; }
+.lb-button-yellow { background:var(--lb-yellow); }
+.lb-reveal .lb-text-button { margin-top:12px; }
+@keyframes lb-breathe { 0%,100% { transform:translateY(0) rotate(-.3deg); } 50% { transform:translateY(-4px) rotate(.3deg); } }
+@keyframes lb-chest-glint { 0%,65%,100% { filter:brightness(1); transform:translateY(0); } 76% { filter:brightness(1.14); transform:translateY(-3px); } 85% { filter:brightness(1); transform:translateY(0); } }
+@keyframes lb-reward-pop { from { opacity:0; transform:translateY(12px) scale(.94); } to { opacity:1; transform:none; } }
+#lobby[hidden] * { animation-play-state:paused !important; }
+@media (max-width:1150px) {
+  .lb-header { gap:25px; padding:16px 24px; } .lb-edition { display:none; } .lb-nav { margin-left:auto; } .lb-wallet { margin-left:0; padding:10px 18px; }
+  .lb-stage { min-height:650px; } .lb-loadout { left:5%; max-width:44%; padding:12px; background:#fff4dce8; border:2px solid #493526; } .lb-loadout h2 { font-size:20px; }
+  .lb-change { font-size:14px !important; padding:10px; } .lb-chest { width:45%; left:0; bottom:9%; }
+  .lb-poster-copy { padding:12% 11% 9%; } .lb-play { min-height:78px !important; } .lb-items { grid-template-columns:repeat(2,minmax(0,1fr)); gap:17px; }
+  .lb-character:not(.lb-character-mini) { right:-23%; } .lb-chest-art { max-height:130px; }
+}
+@media (min-width:700px) and (max-height:650px) { .lb-header { min-height:90px; } .lb-stage { height:650px; } }
+@media (max-width:699px) {
+  .lb-header { min-height:118px; display:grid; grid-template-columns:1fr auto; grid-template-rows:auto auto; padding:14px 18px 12px; gap:13px 18px; }
+  .lb-brand-title { font-size:40px; } .lb-brand-title span { font-size:9px; margin-top:7px; }
+  .lb-wallet { grid-column:2; grid-row:1; padding:8px 15px; gap:7px; border-width:2px; } .lb-wallet strong { font-size:30px; } .lb-wallet span { font-size:13px; }
+  .lb-nav { grid-column:1 / -1; grid-row:2; margin:0; gap:12px; } .lb-nav button { flex:1; padding:6px 12px; font-size:18px !important; border-width:2px; } .lb-nav button span { font-size:11px; }
+  .lb-stage { display:flex; flex-direction:column; gap:0; height:auto; max-height:none; min-height:0; padding:8px 10px 20px; }
+  .lb-room { object-position:37% center; opacity:.75; }
+  .lb-poster { margin:0; width:100%; height:372px; flex:none; } .lb-poster-copy { padding:31px 32px 28px; } .lb-next-label { font-size:28px; }
+  .lb-poster h1 { font-size:67px; margin:6px 0 8px !important; -webkit-text-stroke:1px var(--lb-ink); text-shadow:3px 4px var(--lb-ink); letter-spacing:1px; }
+  .lb-progress { font-size:22px; } .lb-play { min-height:63px !important; font-size:37px !important; margin-top:13px; padding:9px 5px; }
+  .lb-poster.is-complete h1 { font-size:44px; } .lb-poster.is-complete .lb-next-label { font-size:19px; } .lb-poster.is-complete .lb-play { font-size:29px !important; }
+  .lb-fight-reward { font-size:14px; margin-top:12px !important; } .lb-opponent-link { margin-top:3px; font-size:14px !important; padding:5px 10px; }
+  .lb-showcase { height:730px; flex:none; overflow:hidden; }
+  .lb-character:not(.lb-character-mini) { height:520px; right:-17%; top:0; bottom:auto; }
+  .lb-loadout { top:65px; left:3%; width:43%; max-width:43%; padding:12px; } .lb-kicker { font-size:24px; } .lb-loadout h2 { font-size:19px; margin-top:10px !important; } .lb-loadout p { font-size:16px; }
+  .lb-change { margin-top:12px; font-size:13px !important; padding:9px; }
+  .lb-chest { width:94%; left:3%; bottom:0; display:grid; grid-template-columns:36% 1fr; align-items:center; }
+  .lb-chest-art { width:112%; margin-left:-7%; height:180px; max-height:none; } .lb-chest-label { padding:14px 12px; margin:0; transform:rotate(-1deg); }
+  .lb-chest h2 { font-size:25px; } .lb-chest h2 span { font-size:12px; } .lb-chest p { font-size:12px; } .lb-chest small { font-size:10px; }
+  .lb-chest-open { font-size:20px !important; margin-top:9px; padding:8px; }
+  .lb-footer { flex-direction:column; align-items:flex-start; padding:20px; gap:9px; } .lb-footer p { font-size:11px; }
+  .lb-feedback.has-message { font-size:13px; padding:12px 18px; }
+  .lb-locker { padding:25px 18px; } .lb-locker-heading { align-items:flex-start; gap:10px; } .lb-locker h1 { font-size:46px; } .lb-locker-heading p { font-size:14px; } .lb-owned { font-size:20px; margin-top:4px; }
+  .lb-locker-layout { display:flex; flex-direction:column; gap:28px; } .lb-fitting-room { position:relative; top:0; border-right:0; border-bottom:2px solid #bda883; width:100%; }
+  .lb-fitting-art { height:310px; margin:auto; } .lb-character-mini { height:310px; margin-right:-103.33px; }
+  .lb-collection>section>h2 { font-size:30px; } .lb-collection h2 small { font-size:12px; margin-left:8px; }
+  .lb-items { gap:15px; } .lb-item { padding:12px; } .lb-item h3 { font-size:24px; } .lb-item-top { font-size:8px; } .lb-item-top>span:last-child { font-size:7px; } .lb-item-art { height:140px; }
+  #lobby .lb-reveal { padding:25px 20px; } .lb-reveal h2 { font-size:44px; }
+}
+@media (max-width:360px) { .lb-header { padding-inline:13px; } .lb-wallet { padding-inline:10px; } .lb-poster-copy { padding-inline:25px; } .lb-poster h1 { font-size:58px; } .lb-play { font-size:31px !important; } .lb-fight-reward { font-size:12px; } .lb-change { font-size:12px !important; padding:8px 7px; } .lb-loadout h2 { font-size:17px; } }
+body.touch #lobby { padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px); }
+@media (prefers-reduced-motion:reduce) { #lobby *,#lobby *::before,#lobby *::after { animation:none !important; transition:none !important; } }
+
+@media (min-width:700px) { .lb-next-label { transform:translateY(-35px) rotate(-3deg); } }
+
+
+
+@media (min-width:700px) and (max-width:1150px) {
+  .lb-chest { bottom:0; }
+  .lb-next-label { transform:rotate(-3deg); }
+  .lb-poster h1 { margin:10px 0 10px !important; }
+  .lb-play { margin-top:18px; min-height:68px !important; padding:9px; }
+  .lb-fight-reward { margin-top:13px !important; font-size:13px; }
+  .lb-opponent-link { margin-top:2px; font-size:13px !important; }
+}
+@media (min-width:1151px) {
+  .lb-play { min-height:140px !important; font-size:clamp(64px,5.2vw,86px) !important; }
+}

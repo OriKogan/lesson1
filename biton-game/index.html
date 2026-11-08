@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Biton: The Reckoning</title>
+<link rel="stylesheet" href="lobby.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bangers&family=Patrick+Hand&display=swap" rel="stylesheet">
+<style>
+  :root { --bg: #0d0d12; --btn: rgba(0,0,0,0.38); --btn-on: rgba(255,225,77,0.7); --ink: #fff; }
+  * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  html, body { margin: 0; height: 100%; background: var(--bg); overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none; }
+  body { display: flex; align-items: center; justify-content: center; padding-bottom: 58px; font-family: 'Bangers', Impact, sans-serif; }
+  #wrap { position: relative; width: min(100vw, calc((100vh - 58px) * 16 / 9)); aspect-ratio: 16 / 9; }
+  canvas { display: block; width: 100%; height: 100%; background: #000; image-rendering: auto; }
+  #touch, #touchUtility, #mobileGuide { display:none; }
+  .touch-help { display:none; }
+  .controls-bar { position: fixed; bottom: 0; left: 0; right: 0; min-height: 58px; display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 9px 18px; padding: 9px 12px; background: #111722; border-top: 2px solid #344353; color: #f7f6f0; font: 13px/1.4 system-ui, sans-serif; }
+  .controls-bar span { white-space: nowrap; }
+  kbd { display: inline-block; min-width: 21px; padding: 2px 5px; margin-right: 3px; border: 1px solid #657081; border-bottom-width: 3px; border-radius: 4px; background: #293444; color: #fff; font: bold 12px system-ui, sans-serif; }
+  .primary-binding kbd { background: #ffe14d; color: #141414; border-color: #bc9f2a; }
+  #helpBtn, .help-close { border: 2px solid #ffe14d; border-radius: 6px; padding: 6px 12px; background: #ffe14d; color: #141414; font: bold 13px system-ui,sans-serif; cursor: pointer; }
+  button:focus-visible, canvas:focus-visible { outline: 3px solid #79d9ff; outline-offset: 2px; }
+  dialog { width: min(640px, calc(100vw - 28px)); max-height: 85vh; overflow-y: auto; padding: 26px; border: 2px solid #ffe14d; border-radius: 14px; background: #172131; color: #f7f6f0; box-shadow: 0 20px 80px #000a; font: 16px/1.5 system-ui,sans-serif; user-select: text; touch-action: auto; }
+  dialog::backdrop { background: #000b; }
+  dialog h2 { margin: 0 0 8px; font-size: 27px; }
+  dialog p { color: #d7e3ed; }
+  dialog dl { display: grid; grid-template-columns: 115px 1fr; gap: 12px 20px; }
+  dialog dt { font-weight: bold; } dialog dd { margin: 0; }
+  dialog form { text-align: right; margin-top: 24px; }
+  .touch-setting { display:flex; align-items:center; gap:12px; min-height:48px; padding:12px; border:1px solid #64758c; border-radius:6px; cursor:pointer; }
+  .touch-setting input { width:24px; height:24px; flex-shrink:0; accent-color:#ffe14d; }
+  .touch-setting small { display:block; margin-top:3px; color:#bdcddd; font-size:12px; }
+  @media (max-width: 900px) { body { padding-bottom: 92px; } #wrap { width: min(100vw, calc((100vh - 92px) * 16 / 9)); } .controls-bar { min-height: 92px; gap: 6px 12px; font-size: 12px; } }
+  @media (max-width: 480px) { body { padding-bottom: 120px; } #wrap { width: min(100vw, calc((100vh - 120px) * 16 / 9)); } .controls-bar { min-height: 120px; gap: 5px 10px; } dialog { padding: 18px; } dialog dl { grid-template-columns: 80px 1fr; gap: 10px; } }
+  /* Touch controls live outside the arena, with a full-size primary attack. */
+  body.touch { --safe-top:env(safe-area-inset-top,0px); --safe-right:env(safe-area-inset-right,0px); --safe-bottom:env(safe-area-inset-bottom,0px); --safe-left:env(safe-area-inset-left,0px); --view-height:100vh; height:var(--view-height); padding:0; }
+  @supports (height:100dvh) { body.touch { --view-height:100dvh; } }
+  body.touch .controls-bar, body.touch .desktop-help { display:none; }
+  body.touch .touch-help { display:block; }
+  body.touch dl.touch-help { display:grid; }
+  body.touch #wrap { width:min(calc(100vw - var(--safe-left) - var(--safe-right)),calc((var(--view-height) - 76px - var(--safe-top) - var(--safe-bottom)) * 16 / 9)); }
+  body.touch.combat-controls-active #touch { display:block; position:fixed; inset:0; z-index:10; pointer-events:none; }
+  .pad { position:fixed; display:grid; gap:6px; align-items:center; pointer-events:auto; }
+  .pad button { width:48px; height:48px; min-width:44px; min-height:44px; padding:0 2px; border-radius:14px; border:2px solid #fff4cd; background:#294c61; color:#fff9e6; font:16px/1 'Bangers',Impact,sans-serif; letter-spacing:.45px; box-shadow:0 3px 0 #07141e; touch-action:none; -webkit-touch-callout:none; }
+  .pad button.on { background:#fff1a0; color:#181e2b; transform:translateY(2px); box-shadow:0 1px 0 #07141e; }
+  .pad.left [data-act="left"], .pad.left [data-act="right"] { background:#92dce1; color:#142a38; font-size:22px; }
+  .pad button[data-act="punch"] { grid-area:punch; width:64px; height:64px; background:#ffda44; color:#231d28; font-size:23px; border:3px solid #fff3aa; border-radius:50%; box-shadow:0 4px 0 #925721; }
+  .pad button[data-act="punch"].on { background:#fff5b9; box-shadow:0 2px 0 #925721; }
+  .pad [data-act="special"] { background:#8854ae; }
+  .pad [data-act="taunt"] { background:#374052; font-size:14px; }
+  .pad.left { left:max(8px,var(--safe-left)); bottom:calc(8px + var(--safe-bottom)); grid-template-columns:repeat(4,48px); grid-template-areas:"left right up down"; }
+  .pad.left [data-act="up"] { grid-area:up; } .pad.left [data-act="left"] { grid-area:left; }
+  .pad.left [data-act="down"] { grid-area:down; } .pad.left [data-act="right"] { grid-area:right; }
+  .pad.right { right:max(8px,var(--safe-right)); bottom:calc(6px + var(--safe-bottom)); grid-template-columns:repeat(3,48px) 64px; grid-template-areas:"taunt special kick punch"; }
+  .pad.right [data-act="taunt"] { grid-area:taunt; } .pad.right [data-act="special"] { grid-area:special; } .pad.right [data-act="kick"] { grid-area:kick; }
+  body.touch #touchUtility { display:flex; position:fixed; z-index:11; gap:5px; bottom:calc(8px + var(--safe-bottom)); left:50%; transform:translateX(-50%); }
+  #touchUtility button { min-width:44px; min-height:44px; width:46px; padding:4px 2px; border:1px solid #73808f; border-radius:8px; background:#202936; color:#f7f0da; font:13px/1.05 'Bangers',Impact,sans-serif; letter-spacing:.4px; touch-action:manipulation; }
+  #touchUtility button[aria-pressed="true"] { color:#ffda44; border-color:#ffda44; }
+  body.touch:not(.in-fight) #menuBtn { display:none; }
+  body.touch #mobileGuide { display:block; position:fixed; left:12px; right:12px; bottom:calc(83px + var(--safe-bottom)); text-align:center; color:#d0d9df; font:12px/1.4 system-ui,sans-serif; pointer-events:none; }
+  #mobileGuide strong { display:none; }
+  body.touch.in-fight #mobileGuide { display:none; }
+  body.touch dialog { max-height:calc(var(--view-height) - 24px - var(--safe-top) - var(--safe-bottom)); }
+  @media (orientation:landscape) {
+    body.touch { padding:var(--safe-top) var(--safe-right) calc(76px + var(--safe-bottom)) var(--safe-left); }
+  }
+  /* Wide phones use thumb rails so the fight can use almost the full height. */
+  @media (orientation:landscape) and (min-aspect-ratio:2/1) {
+    body.touch { padding:calc(6px + var(--safe-top)) calc(106px + var(--safe-right)) calc(6px + var(--safe-bottom)) calc(106px + var(--safe-left)); }
+    body.touch #wrap { width:min(calc(100vw - 212px - var(--safe-left) - var(--safe-right)),calc((var(--view-height) - 12px - var(--safe-top) - var(--safe-bottom)) * 16 / 9)); }
+    .pad.left { grid-template-columns:repeat(2,46px); grid-template-areas:"up down" "left right"; gap:6px; bottom:calc(22px + var(--safe-bottom)); }
+    .pad.left button { width:46px; height:52px; }
+    .pad.right { grid-template-columns:repeat(2,46px); grid-template-areas:"taunt special" "kick kick" "punch punch"; justify-items:center; bottom:calc(14px + var(--safe-bottom)); }
+    .pad.right button { width:46px; height:44px; }
+    .pad.right [data-act="kick"] { width:98px; }
+    .pad.right button[data-act="punch"] { width:76px; height:76px; font-size:24px; }
+    body.touch #touchUtility { left:max(8px,var(--safe-left)); top:calc(10px + var(--safe-top)); bottom:auto; width:98px; transform:none; flex-wrap:wrap; justify-content:center; }
+    body.touch #mobileGuide { left:6px; right:auto; width:96px; bottom:calc(145px + var(--safe-bottom)); font-size:11px; padding:0 5px; }
+  }
+  @media (orientation:portrait) {
+    body.touch { padding:calc(68px + var(--safe-top)) var(--safe-right) calc(208px + var(--safe-bottom)) var(--safe-left); }
+    body.touch #wrap { width:100%; max-width:calc((var(--view-height) - 276px - var(--safe-top) - var(--safe-bottom)) * 16 / 9); }
+    body.touch #touchUtility { top:calc(12px + var(--safe-top)); bottom:auto; }
+    #touchUtility button { width:66px; }
+    .pad.left { grid-template-columns:repeat(2,54px); grid-template-areas:"up down" "left right"; bottom:calc(24px + var(--safe-bottom)); }
+    .pad.left button { width:54px; height:58px; }
+    .pad.right { grid-template-columns:54px 80px; grid-template-areas:"taunt special" "kick punch"; bottom:calc(24px + var(--safe-bottom)); }
+    .pad.right button { width:54px; height:54px; }
+    .pad.right [data-act="special"] { justify-self:center; width:72px; }
+    .pad.right button[data-act="punch"] { width:80px; height:80px; font-size:25px; }
+    body.touch #mobileGuide, body.touch.in-fight #mobileGuide { display:block; bottom:calc(180px + var(--safe-bottom)); font-size:12px; }
+    #mobileGuide strong { display:block; color:#ffdf64; font:22px/1.2 'Bangers',Impact,sans-serif; letter-spacing:.7px; margin-bottom:5px; }
+    body.touch:not(.combat-controls-active) #mobileGuide span { display:none; }
+  }
+  @media (orientation:landscape) and (max-width:620px) {
+    .pad.left { grid-template-columns:repeat(4,44px); gap:4px; }
+    .pad.left button, .pad.right button { width:44px; }
+    .pad.right { grid-template-columns:repeat(3,44px) 58px; gap:4px; }
+    .pad.right button[data-act="punch"] { width:58px; height:58px; font-size:21px; }
+    body.touch #touchUtility { bottom:auto; top:calc(6px + var(--safe-top)); left:auto; right:max(6px,var(--safe-right)); transform:none; flex-direction:column; }
+    #touchUtility button { width:44px; }
+    body.touch #wrap { width:min(calc(100vw - 104px - var(--safe-left) - var(--safe-right)),calc((var(--view-height) - 76px - var(--safe-top) - var(--safe-bottom)) * 16 / 9)); }
+  }
+</style>
+</head>
+<body>
+<div id="wrap">
+  <canvas id="game" width="960" height="540" tabindex="0" aria-label="Biton: The Reckoning, a fighting game"></canvas>
+  <div id="touch">
+    <div class="pad left">
+      <button data-act="up" aria-label="Jump">JUMP</button>
+      <button data-act="left" aria-label="Left">&#9664;</button>
+      <button data-act="down" aria-label="Block">BLOCK</button>
+      <button data-act="right" aria-label="Right">&#9654;</button>
+    </div>
+    <div class="pad right">
+      <button data-act="taunt">TAUNT</button>
+      <button data-act="special" aria-label="Special attack">SPECIAL</button>
+      <button data-act="punch">PUNCH</button>
+      <button data-act="kick">KICK</button>
+    </div>
+  </div>
+</div>
+<nav id="touchUtility" aria-label="Game options">
+  <button id="menuBtn" data-act="pause" aria-label="Pause game">PAUSE</button>
+  <button id="muteBtn" data-act="mute" aria-label="Mute sound" aria-pressed="false">SOUND ON</button>
+  <button id="touchHelpBtn" data-act="help" aria-haspopup="dialog">HELP</button>
+</nav>
+<aside id="mobileGuide"><strong>Turn sideways for a bigger fight</strong><span>Move with your left thumb. Punch with your right.</span></aside>
+<aside class="controls-bar" aria-label="Game controls">
+  <span class="primary-binding"><kbd>Left click</kbd> Punch</span>
+  <span><kbd>A</kbd><kbd>D</kbd> Move</span>
+  <span><kbd>W</kbd><kbd>Space</kbd> Jump</span>
+  <span><kbd>S</kbd> Block</span>
+  <span><kbd>K</kbd> Kick</span>
+  <span><kbd>L</kbd> Special</span>
+  <span><kbd>T</kbd> Taunt</span>
+  <span><kbd>P</kbd> Pause</span>
+  <button id="helpBtn" type="button" aria-haspopup="dialog">Help <kbd>H</kbd></button>
+</aside>
+<dialog id="controlsHelp" aria-labelledby="controlsTitle">
+  <h2 id="controlsTitle">How to play</h2>
+  <p class="desktop-help">Move close to your opponent, then left-click to punch. Block their attack, then counter.</p>
+  <p class="touch-help">Move close with the arrows on the left, then tap the big yellow Punch button on the right. Hold Block to defend, then counter.</p>
+  <dl class="desktop-help">
+    <dt>Punch</dt><dd><kbd>Left click</kbd> or <kbd>J</kbd></dd>
+    <dt>Move</dt><dd><kbd>A</kbd><kbd>D</kbd> or <kbd>←</kbd><kbd>→</kbd></dd>
+    <dt>Jump</dt><dd><kbd>W</kbd> <kbd>↑</kbd> or <kbd>Space</kbd></dd>
+    <dt>Block</dt><dd>Hold <kbd>S</kbd> or <kbd>↓</kbd></dd>
+    <dt>Kick</dt><dd><kbd>K</kbd></dd>
+    <dt>Special</dt><dd><kbd>L</kbd> throws a slipper at 30 meter. At 100 meter, it triggers your super.</dd>
+    <dt>Taunt</dt><dd><kbd>T</kbd> builds meter. You start with 50.</dd>
+    <dt>Pause</dt><dd><kbd>P</kbd> pauses or resumes. <kbd>Esc</kbd> goes back or quits from pause.</dd>
+    <dt>Sound</dt><dd><kbd>M</kbd> mutes or unmutes.</dd>
+  </dl>
+  <dl class="touch-help">
+    <dt>Move</dt><dd>Hold the left or right arrow. You can move and attack together.</dd>
+    <dt>Attack</dt><dd>Tap Punch for a quick hit or Kick for more reach.</dd>
+    <dt>Defend</dt><dd>Hold Block, or tap Jump to leap.</dd>
+    <dt>Special</dt><dd>Special throws a slipper at 30 meter. At 100 meter, it triggers your super.</dd>
+    <dt>Taunt</dt><dd>Tap Taunt to build meter. You start with 50.</dd>
+    <dt>Options</dt><dd>Pause, Sound and Help stay within reach. Turn sideways for a bigger arena.</dd>
+  </dl>
+  <label class="touch-setting"><input id="touchControlsToggle" type="checkbox"><span>Touch controls<small>Show touch controls and phone layout.</small></span></label>
+  <form method="dialog"><button class="help-close" autofocus>Back to game</button></form>
+</dialog>
+<script src="config.js"></script>
+<script src="audio.js"></script>
+<script src="economy.js"></script>
+<script src="game.js"></script>
+<script src="bosses.js"></script>
+<script src="lobby.js"></script>
+</body>
+</html>
